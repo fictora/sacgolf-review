@@ -1,0 +1,106 @@
+/* Sac Golf review layer. Uses the site's own palette/type (sg-base.css vars). */
+.sgr, .sgr * { box-sizing: border-box; }
+.sgr { --sgr-forest: var(--forest, #1F3226); --sgr-bone: var(--bone, #F1F0EA); --sgr-paper: var(--paper, #FAF9F5);
+  --sgr-ink: var(--ink, #1A1D1A); --sgr-muted: var(--muted, #6A6F68); --sgr-line: var(--line, #D6D4CA); --sgr-brass: var(--brass, #B8995C);
+  font-family: var(--sans, "Instrument Sans", Helvetica, Arial, sans-serif); font-size: 14px; line-height: 1.45; color: var(--sgr-ink); }
+
+/* The root covers nothing: only its children take pointer events. */
+.sgr-root { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+.sgr-root > * { pointer-events: auto; }
+
+.sgr-dock { position: fixed; left: 20px; bottom: 20px; display: flex; gap: 6px; padding: 6px; border-radius: 999px;
+  background: rgba(31, 50, 38, .96); border: 1px solid rgba(241, 240, 234, .18); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.sgr-btn { appearance: none; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(241, 240, 234, .28); background: transparent;
+  color: var(--sgr-paper); font: 600 13px/1 var(--sans, sans-serif); letter-spacing: .01em; cursor: pointer; white-space: nowrap; }
+.sgr-btn:hover { background: rgba(241, 240, 234, .1); }
+.sgr-btn--solid { background: var(--sgr-bone); color: var(--sgr-forest); border-color: var(--sgr-bone); }
+.sgr-btn--solid:hover { background: #fff; }
+.sgr-btn:disabled { opacity: .55; cursor: default; }
+.sgr-btn--light { border-color: rgba(241, 240, 234, .5); min-height: 34px; }
+.sgr-badge { display: none; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--sgr-brass);
+  color: var(--sgr-forest); font: 700 11px/18px var(--sans, sans-serif); text-align: center; }
+.sgr-badge:not(:empty) { display: inline-block; }
+
+/* Mark-up banner */
+.sgr-bar { position: fixed; top: 0; left: 0; right: 0; display: none; align-items: center; justify-content: center; gap: 14px;
+  padding: 10px 16px; background: var(--sgr-brass); color: var(--sgr-forest); font-weight: 600; font-size: 13.5px; }
+.sgr-bar .sgr-btn { color: var(--sgr-forest); border-color: rgba(31, 50, 38, .45); }
+.sgr-marking .sgr-bar { display: flex; }
+.sgr-marking, .sgr-marking * { cursor: crosshair !important; }
+.sgr-marking .sgr-root *, .sgr-marking .sgr-pins * { cursor: pointer !important; }
+.sgr-hl { position: fixed; left: 0; top: 0; display: none; pointer-events: none !important; border: 2px solid var(--sgr-brass);
+  border-radius: 4px; background: rgba(184, 153, 92, .12); box-shadow: 0 0 0 9999px rgba(26, 29, 26, .08); transition: transform .08s, width .08s, height .08s; }
+
+/* Panels: card on desktop, bottom sheet on phones */
+.sgr-panel { position: fixed; left: 20px; bottom: 80px; width: min(400px, calc(100vw - 40px)); max-height: min(70vh, 640px);
+  display: none; flex-direction: column; background: var(--sgr-paper); border: 1px solid var(--sgr-line); border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .28); overflow: hidden; }
+.sgr-panel.is-open { display: flex; }
+.sgr-panel__head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--sgr-forest); color: var(--sgr-paper); }
+.sgr-panel__title { margin: 0; font: 400 22px/1.1 var(--serif, Georgia, serif); letter-spacing: -.01em; }
+.sgr-x { appearance: none; border: 0; background: none; color: var(--sgr-paper); font-size: 26px; line-height: 1; width: 36px; height: 36px; cursor: pointer; }
+.sgr-panel__body { padding: 14px 16px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; flex: 1; }
+.sgr-hint { margin: 0; color: var(--sgr-muted); font-size: 12.5px; }
+.sgr-eyebrow { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--sgr-muted); margin-bottom: 4px; }
+.sgr-target q, .sgr-note__snip { display: block; quotes: none; font: italic 400 15px/1.35 var(--serif, Georgia, serif); color: var(--sgr-ink);
+  border-left: 2px solid var(--sgr-brass); padding-left: 10px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.sgr-input { width: 100%; resize: vertical; border: 1px solid var(--sgr-line); border-radius: 8px; background: #fff; padding: 10px 12px;
+  font: 400 16px/1.4 var(--sans, sans-serif); color: var(--sgr-ink); }
+.sgr-input:focus { outline: 2px solid var(--sgr-brass); outline-offset: 1px; }
+.sgr-row { display: flex; justify-content: flex-end; gap: 8px; }
+.sgr-panel .sgr-btn { color: var(--sgr-forest); border-color: var(--sgr-line); }
+.sgr-panel .sgr-btn--solid { background: var(--sgr-forest); color: var(--sgr-paper); border-color: var(--sgr-forest); }
+
+.sgr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sgr-note { border: 1px solid var(--sgr-line); border-radius: 10px; padding: 10px 12px; background: #fff; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+.sgr-note__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sgr-note__text { margin: 0; }
+.sgr-note__reply { margin: 0; padding: 8px 10px; border-radius: 8px; background: var(--sgr-bone); font-size: 13px; }
+.sgr-meta { font-size: 11.5px; color: var(--sgr-muted); }
+.sgr-empty { color: var(--sgr-muted); font-size: 13px; margin: 6px 0; }
+.sgr-chip { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.sgr-chip--received { background: var(--sgr-bone); color: var(--sgr-ink); border: 1px solid var(--sgr-line); }
+.sgr-chip--working { background: var(--sgr-brass); color: var(--sgr-forest); animation: sgr-pulse 1.4s ease-in-out infinite; }
+.sgr-chip--done { background: var(--sgr-forest); color: var(--sgr-paper); }
+.sgr-chip--failed { background: #8a3b2e; color: #fff; }
+@keyframes sgr-pulse { 50% { opacity: .6; } }
+
+/* Pins: only shown while marking or with the notes list open */
+.sgr-pins { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 2147482999; }
+.sgr-pins:not(.is-on) { display: none; }
+.sgr-pin { position: absolute; width: 24px; height: 24px; border-radius: 50% 50% 50% 4px; border: 2px solid #fff; padding: 0;
+  background: var(--brass, #B8995C); color: var(--forest, #1F3226); font: 700 11px/20px var(--sans, sans-serif); text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .3); cursor: pointer; }
+.sgr-pin--done { background: var(--forest, #1F3226); color: var(--paper, #FAF9F5); }
+.sgr-pin--failed { background: #8a3b2e; color: #fff; }
+
+/* Chat */
+.sgr-chat { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; min-height: 120px; max-height: 42vh; padding: 2px; }
+.sgr-msg { max-width: 85%; display: flex; flex-direction: column; gap: 3px; }
+.sgr-msg__body { padding: 9px 12px; border-radius: 14px; white-space: pre-wrap; word-wrap: break-word; }
+.sgr-msg--mark { align-self: flex-end; align-items: flex-end; }
+.sgr-msg--mark .sgr-msg__body { background: var(--sgr-forest); color: var(--sgr-paper); border-bottom-right-radius: 4px; }
+.sgr-msg--ted .sgr-msg__body { background: var(--sgr-bone); color: var(--sgr-ink); border-bottom-left-radius: 4px; }
+.sgr-typing { font-size: 12px; color: var(--sgr-muted); font-style: italic; }
+.sgr-chatform { display: flex; gap: 8px; align-items: flex-end; }
+.sgr-chatform .sgr-input { resize: none; }
+
+.sgr-toast { position: fixed; left: 50%; bottom: 96px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  z-index: 2147483001; max-width: min(460px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 10px; background: var(--forest, #1F3226);
+  color: var(--paper, #FAF9F5); font: 500 13.5px/1.4 var(--sans, sans-serif); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); transition: opacity .2s, transform .2s; }
+.sgr-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  /* Sit above the site's floating "Book a Bay" button, which keeps bottom-right. */
+  .sgr-dock { left: 12px; bottom: 84px; gap: 4px; padding: 4px; }
+  .sgr-btn { min-height: 38px; padding: 0 12px; font-size: 12.5px; }
+  .sgr-panel { left: 0; right: 0; bottom: 0; width: 100%; max-height: 82vh; border-radius: 16px 16px 0 0; border-bottom: 0; }
+  .sgr-root.has-panel .sgr-dock { display: none; }
+  .sgr-chat { max-height: 50vh; }
+  .sgr-bar { font-size: 12.5px; padding: 8px 12px; }
+}
+
+/* Let the end of every page scroll clear of the dock. */
+html:has(.sgr-root) body { padding-bottom: 76px; }
+@media (max-width: 640px) { html:has(.sgr-root) body { padding-bottom: 140px; } }
